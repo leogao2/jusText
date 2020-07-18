@@ -45,21 +45,26 @@ class Paragraph(object):
         self.text_nodes.append(text)
         return text
 
-    def stopwords_count(self, stopwords):
+    def stopwords_count(self, stopwords, zhja_mode=False):
         count = 0
 
-        for word in self.text.split():
-            if word.lower() in stopwords:
-                count += 1
+        if zhja_mode:
+            pattern = "(" + "|".join([re.escape(x) for x in stopwords]) + ")"
+            for match in re.findall(pattern, self.text):
+                count += len(match)
+        else:
+            for word in self.text.split():
+                if word.lower() in stopwords:
+                    count += 1
 
         return count
 
-    def stopwords_density(self, stopwords):
-        words_count = self.words_count
+    def stopwords_density(self, stopwords, zhja_mode=False):
+        words_count = len(self.text) if zhja_mode else self.words_count
         if words_count == 0:
             return 0
 
-        return self.stopwords_count(stopwords) / words_count
+        return self.stopwords_count(stopwords, zhja_mode) / words_count
 
     def links_density(self):
         text_length = len(self.text)

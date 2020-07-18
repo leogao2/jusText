@@ -226,13 +226,13 @@ class PathInfo(object):
 def classify_paragraphs(paragraphs, stoplist, length_low=LENGTH_LOW_DEFAULT,
         length_high=LENGTH_HIGH_DEFAULT, stopwords_low=STOPWORDS_LOW_DEFAULT,
         stopwords_high=STOPWORDS_HIGH_DEFAULT, max_link_density=MAX_LINK_DENSITY_DEFAULT,
-        no_headings=NO_HEADINGS_DEFAULT):
+        no_headings=NO_HEADINGS_DEFAULT, zhja_mode=False):
     "Context-free paragraph classification."
 
     stoplist = frozenset(w.lower() for w in stoplist)
     for paragraph in paragraphs:
         length = len(paragraph)
-        stopword_density = paragraph.stopwords_density(stoplist)
+        stopword_density = paragraph.stopwords_density(stoplist, zhja_mode=zhja_mode)
         link_density = paragraph.links_density()
         paragraph.heading = bool(not no_headings and paragraph.is_heading)
 
@@ -361,7 +361,7 @@ def justext(html_text, stoplist, length_low=LENGTH_LOW_DEFAULT,
         stopwords_high=STOPWORDS_HIGH_DEFAULT, max_link_density=MAX_LINK_DENSITY_DEFAULT,
         max_heading_distance=MAX_HEADING_DISTANCE_DEFAULT, no_headings=NO_HEADINGS_DEFAULT,
         encoding=None, default_encoding=DEFAULT_ENCODING,
-        enc_errors=DEFAULT_ENC_ERRORS, preprocessor=preprocessor):
+        enc_errors=DEFAULT_ENC_ERRORS, preprocessor=preprocessor, zhja_mode=False):
     """
     Converts an HTML page into a list of classified paragraphs. Each paragraph
     is represented as instance of class ˙˙justext.paragraph.Paragraph˙˙.
@@ -372,7 +372,7 @@ def justext(html_text, stoplist, length_low=LENGTH_LOW_DEFAULT,
     paragraphs = ParagraphMaker.make_paragraphs(dom)
 
     classify_paragraphs(paragraphs, stoplist, length_low, length_high,
-        stopwords_low, stopwords_high, max_link_density, no_headings)
+        stopwords_low, stopwords_high, max_link_density, no_headings, zhja_mode)
     revise_paragraph_classification(paragraphs, max_heading_distance)
 
     return paragraphs
